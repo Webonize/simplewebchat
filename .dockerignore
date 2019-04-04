@@ -1,0 +1,6 @@
+# Ignore all data from Git
+.git
+.gitignore
+
+# Ignore all files unused by the apps
+*.md
