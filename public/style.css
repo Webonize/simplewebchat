@@ -30,3 +30,9 @@
   color: black;
   resize: none;
 }
+
+a {
+  font-weight: bold;
+  text-decoration: unset !important;
+  color: unset !important;
+}
