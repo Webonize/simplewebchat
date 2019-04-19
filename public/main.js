@@ -9,7 +9,7 @@ let canPlayNotification = false
 socket.on('newmsg', data => {
 
   const scrollDown = el.scrollTop - el.scrollHeight + el.clientHeight >= -5
-  const urlReg = /(https?:\/\/)?([a-z0-9\.\-]*)\.([a-z0-9]{2,9})(\:[0-9]{1,5})?([\/\#\?]?(.*))/ig
+  const urlReg = /((https?:\/\/)?([a-z0-9\.\-]*)\.([a-z0-9]{2,9})(\:[0-9]{1,5})?([\/\#\?]?(.*)))/ig
   const msgWithUrl = data.msg.replace(urlReg, '<a href="$1" target="blank">$2$3.$4</a>')
 
   el.innerHTML += `<pre style="margin:0;padding:5px 0;color:${data.color};">${data.user}@${data.userip}~ ${msgWithUrl}</pre>`
