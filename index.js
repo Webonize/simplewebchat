@@ -16,35 +16,63 @@ const io = socketio(appServer, {
 })
 
 let messages = []
+const colorArr = [
+  '#8AE234', // light lime
+  '#FCE94F', // light yellow
+  '#3987EB', // blue
+  '#C662BB', // pink
+  '#34E2E2', // light blue
+]
 
 io.on('connection', socket => {
   socket.username = socket.id
+  socket.color = colorArr[Math.floor(Math.random() * 5)]
+  console.log(socket.color)
+
   messages.forEach(msg => {
-    socket.emit('newmsg', {user: msg.user, msg: msg.msg})
+    socket.emit('newmsg', {
+      user: msg.user, 
+      userip: msg.userip,
+      color: msg.color,
+      msg: msg.msg
+    })
   })
   socket.broadcast.emit('newmsg', {
-    user: '',
-    msg: '[+] '+socket.id+' connected'
+    user: socket.id,
+    userip: socket.handshake.address,
+    color: socket.color,
+    msg: '[+] connected to chat'
   })
 
   socket.on('sendmsg', message => {
-    messages.push({msg: message, user: socket.username})
+    messages.push({
+      msg: message, 
+      user: socket.username,
+      userip: socket.handshake.address,
+      color: socket.color
+    })
     io.emit('newmsg', {
       user: socket.username, 
+      userip: socket.handshake.address,
+      color: socket.color,
       msg: message, 
     })
   })
   .on('setusername', username => {
     socket.broadcast.emit('newmsg', {
-      user: '',
-      msg: 'User '+socket.username+' set their UID to '+username
+      user: socket.username,
+      userip: socket.handshake.address,
+      color: socket.color,
+      msg: 'Set their UID to '+username
     })
     socket.username = username
   })
   .on('disconnect', reason => {
     io.emit('newmsg', {
-      user: '',
-      msg: '[-] '+socket.username+' left - reason: '+reason
+      user: socket.username,
+      userip: socket.handshake.address,
+      color: socket.color,
+      msg: '[-] left for: '+reason
     })
   })
 })
