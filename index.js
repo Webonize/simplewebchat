@@ -27,7 +27,6 @@ const colorArr = [
 io.on('connection', socket => {
   socket.username = socket.id
   socket.color = colorArr[Math.floor(Math.random() * 5)]
-  console.log(socket.color)
 
   messages.forEach(msg => {
     socket.emit('newmsg', {
