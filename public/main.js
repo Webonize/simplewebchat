@@ -6,6 +6,11 @@ const el = document.getElementById('main')
 const notification = document.getElementById('notification')
 let canPlayNotification = false
 
+socket.on('connect', data => {
+  console.log('Connected!')
+  if (!!document.location.search.slice(1)) socket.emit('joinroom', document.location.search.slice(1))
+})
+
 socket.on('newmsg', data => {
 
   const scrollDown = el.scrollTop - el.scrollHeight + el.clientHeight >= -5
@@ -17,8 +22,7 @@ socket.on('newmsg', data => {
   if (!document.hasFocus() && canPlayNotification) notification.play()
 })
 
-
-input.onkeydown = function(e) {
+input.onkeydown = function (e) {
   if (e.key == "Enter" && !e.shiftKey && /[^\n\r\s]+/.test(input.value)) {
     socket.emit('sendmsg', input.value)
     input.value = ''
@@ -47,6 +51,11 @@ function getCookie(name) {
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
     }
     return null;
+}
+
+function joinCustomRoom() {
+  let room = prompt('Enter the room ID')
+  if (!!room) socket.emit('joinroom', room)
 }
 
 function getUidFromuser() {

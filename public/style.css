@@ -22,6 +22,12 @@
   right: 3px;
   z-index: 10;
 }
+#joinRoomBtn {
+  position: fixed;
+  top: 28px;
+  right: 3px;
+  z-index: 10;
+}
 
 #input {
   grid-row-start: 2;

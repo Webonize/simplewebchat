@@ -15,7 +15,6 @@ const io = socketio(appServer, {
   pingInterval: 10000
 })
 
-let messages = []
 const colorArr = [
   '#8AE234', // light lime
   '#FCE94F', // light yellow
@@ -26,17 +25,10 @@ const colorArr = [
 
 io.on('connection', socket => {
   socket.username = socket.id
+  socket.roomid = socket.id
   socket.color = colorArr[Math.floor(Math.random() * 5)]
 
-  messages.forEach(msg => {
-    socket.emit('newmsg', {
-      user: msg.user, 
-      userip: msg.userip,
-      color: msg.color,
-      msg: msg.msg
-    })
-  })
-  socket.broadcast.emit('newmsg', {
+  io.to(socket.roomid).emit('newmsg', {
     user: socket.id,
     userip: socket.handshake.address,
     color: socket.color,
@@ -44,21 +36,40 @@ io.on('connection', socket => {
   })
 
   socket.on('sendmsg', message => {
-    messages.push({
-      msg: message, 
+
+    if (message === '/users') {io.sockets.sockets
+      let usersString = 'Users in this room are: '
+      for (const id in io.sockets.adapter.rooms[socket.roomid].sockets) usersString += io.sockets.sockets[id].username + ', '
+      io.to(socket.id).emit('newmsg', {
+        user: 'system', 
+        userip: 'localhost',
+        color: '#8AE234',
+        msg: usersString, 
+      })
+    } 
+    else {
+      io.to(socket.roomid).emit('newmsg', {
+        user: socket.username, 
+        userip: socket.handshake.address,
+        color: socket.color,
+        msg: message, 
+      })
+    }
+  })
+  .on('joinroom', roomid => {
+    socket.leaveAll()
+    socket.join(roomid)
+    socket.roomid = roomid
+
+    io.to(socket.roomid).emit('newmsg', {
       user: socket.username,
       userip: socket.handshake.address,
-      color: socket.color
-    })
-    io.emit('newmsg', {
-      user: socket.username, 
-      userip: socket.handshake.address,
       color: socket.color,
-      msg: message, 
+      msg: `Joined this room (${roomid})`
     })
   })
   .on('setusername', username => {
-    socket.broadcast.emit('newmsg', {
+    io.to(socket.roomid+'').emit('newmsg', {
       user: socket.username,
       userip: socket.handshake.address,
       color: socket.color,
@@ -67,7 +78,7 @@ io.on('connection', socket => {
     socket.username = username
   })
   .on('disconnect', reason => {
-    io.emit('newmsg', {
+    io.to(socket.roomid).emit('newmsg', {
       user: socket.username,
       userip: socket.handshake.address,
       color: socket.color,
