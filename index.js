@@ -37,10 +37,10 @@ io.on('connection', socket => {
 
   socket.on('sendmsg', message => {
 
-    if (message === '/users') {io.sockets.sockets
-      let usersString = 'Users in this room are: '
+    if (message === '/users') {
+      let usersString = `Users in room ${socket.roomid} are: `
       for (const id in io.sockets.adapter.rooms[socket.roomid].sockets) usersString += io.sockets.sockets[id].username + ', '
-      io.to(socket.id).emit('newmsg', {
+      io.emit('newmsg', {
         user: 'system', 
         userip: 'localhost',
         color: '#8AE234',

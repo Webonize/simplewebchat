@@ -5,10 +5,23 @@ const input = document.getElementById('input')
 const el = document.getElementById('main')
 const notification = document.getElementById('notification')
 let canPlayNotification = false
+let roomid = null
 
 socket.on('connect', data => {
   console.log('Connected!')
-  if (!!document.location.search.slice(1)) socket.emit('joinroom', document.location.search.slice(1))
+  if (!!document.location.search.slice(1)) {
+    socket.emit('joinroom', document.location.search.slice(1))
+    roomid = document.location.search.slice(1)
+  }
+})
+socket.on('reconnect', data => {
+  if (!!roomid) {
+    socket.emit('joinroom', roomid)
+    socket.emit('joinroom', roomid)
+  }
+  if (!!getCookie('username')) {
+    socket.emit('setusername', getCookie('username'))
+  }
 })
 
 socket.on('newmsg', data => {
